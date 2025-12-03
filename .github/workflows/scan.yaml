@@ -24,7 +24,7 @@ jobs:
       - name: Call Example API 2
         run: |
           echo "Calling API 2..."
-          curl -s https://test123nepal.com/posts/1 | jq .
+          curl -s https://invisirisk.com/posts/1 | jq .
 
       - name: Cleanup Build Application Firewall
         if: always()
