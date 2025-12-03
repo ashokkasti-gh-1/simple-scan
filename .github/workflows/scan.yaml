@@ -1,20 +1,45 @@
 name: API Check
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
 
 jobs:
   call-apis:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup InvisiRisk - Build Application Firewall
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v3
-
 
       - name: Call Example API 2
         run: |
           echo "Calling API 2..."
           curl -s https://test123nepal.com/posts/1 | jq .
+
+      - name: Cleanup Build Application Firewall
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
+
+  gather_analytics:
+    runs-on: ubuntu-latest
+    name: Gather Analytics
+    needs: [call-apis]
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.stage.invisirisk.com"
+          app_token: ${{ secrets.IR_API_KEY }}
+          send_job_status: "true"
